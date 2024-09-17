@@ -111,9 +111,6 @@ const questions = [
     },
     {
         question: "Hva var årsakene til at Romerriket ble delt?",
-        answers: ["Både ytre press fra barbarene og indre polit
-    {
-        question: "Hva var årsakene til at Romerriket ble delt?",
         answers: ["Både ytre press fra barbarene og indre politiske utfordringer", "Økonomisk vekst", "Religiøs enhet", "Kulturell enhet"],
         correct: "Både ytre press fra barbarene og indre politiske utfordringer"
     },
