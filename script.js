@@ -6,9 +6,24 @@ const questions = [
         correct: "Kildeanalyse"
     },
     {
-        question: "Hva var en markant endring som jordbruksrevolusjonen førte til?",
-        answers: ["Mindre arbeid", "Mer arbeid", "Økt sivilisasjonsdannelse", "Mindre sivilisasjonsdannelse"],
-        correct: "Økt sivilisasjonsdannelse"
+        question: "Hva er et eksempel på bakenforliggende årsak?",
+        answers: ["Økonomiske faktorer", "En enkelt hendelse", "Politisk beslutning", "En krig"],
+        correct: "Økonomiske faktorer"
+    },
+    {
+        question: "Hva var en hovedårsak til jordbruksrevolusjonen?",
+        answers: ["Økt matproduksjon", "Oppdagelse av metallarbeid", "Utvikling av skriftspråk", "Bygging av store byer"],
+        correct: "Økt matproduksjon"
+    },
+    {
+        question: "Hvordan fungerte demokratiet i Athen?",
+        answers: ["Direkte demokrati", "Representativt demokrati", "Aristokrati", "Monarki"],
+        correct: "Direkte demokrati"
+    },
+    {
+        question: "Hva var en kjennetegn på en sivilisasjon?",
+        answers: ["Skriftsystem", "Jakt og sanking", "Nomadisk livsstil", "Ingen sosial hierarki"],
+        correct: "Skriftsystem"
     },
     {
         question: "Hva var en av hovedforskjellene mellom Athen og Sparta?",
@@ -16,7 +31,7 @@ const questions = [
         correct: "Kvinner hadde mer frihet i Sparta"
     },
     {
-        question: "Hva var en viktig årsak til at Romerriket ble delt?",
+        question: "Hva var en årsak til at Romerriket ble delt?",
         answers: ["Ytre press fra barbarerne", "Indre maktkamp", "Både ytre og indre årsaker", "Manglende ressurser"],
         correct: "Både ytre og indre årsaker"
     },
@@ -24,8 +39,26 @@ const questions = [
         question: "Hva var Pax Romana?",
         answers: ["En periode med kaos", "En periode med fred og stabilitet", "Et stort opprør", "En filosofisk bevegelse"],
         correct: "En periode med fred og stabilitet"
+    },
+    {
+        question: "Hva er et kjennetegn ved det romerske patron-klient-systemet?",
+        answers: ["Økonomisk støtte og beskyttelse", "En form for slaveri", "Et militært hierarki", "Religiøse ritualer"],
+        correct: "Økonomisk støtte og beskyttelse"
+    },
+    {
+        question: "Hva var en av årsakene til at kristendommen ble dominerende i Europa?",
+        answers: ["Romersk støtte", "Økonomisk styring", "Militære erobringer", "Teknologisk utvikling"],
+        correct: "Romersk støtte"
     }
 ];
+
+// Funksjon for å blande en liste
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
 // HTML-elementer
 const questionElement = document.getElementById("question");
@@ -35,6 +68,8 @@ const nextQuestionButton = document.getElementById("nextQuestion");
 
 // Variabler for quizlogikken
 let currentQuestionIndex = 0;
+let score = 0;
+const incorrectQuestions = [];
 
 // Funksjon for å vise neste spørsmål
 function showQuestion() {
@@ -44,7 +79,8 @@ function showQuestion() {
 
     questionElement.textContent = currentQuestion.question;
 
-    const answers = currentQuestion.answers;
+    const answers = [...currentQuestion.answers];
+    shuffle(answers); // Blander svaralternativene
     choicesElement.innerHTML = ""; // Tømmer gamle svaralternativer
 
     // Legger til nye svaralternativer
@@ -65,16 +101,15 @@ function checkAnswer(selectedButton, selectedAnswer, correctAnswer) {
             button.style.backgroundColor = "green"; // Riktig svar blir grønn
         } else if (button === selectedButton && selectedAnswer !== correctAnswer) {
             button.style.backgroundColor = "red"; // Feil svar blir rød
+            if (!incorrectQuestions.includes(currentQuestionIndex)) {
+                incorrectQuestions.push(currentQuestionIndex); // Legger til feil spørsmål
+            }
         }
     });
 
-    // Gi tilbakemelding
+    // Oppdaterer score
     if (selectedAnswer === correctAnswer) {
-        feedbackElement.textContent = "Riktig!";
-        feedbackElement.style.color = "green";
-    } else {
-        feedbackElement.textContent = "Feil, riktig svar er: " + correctAnswer;
-        feedbackElement.style.color = "red";
+        score++;
     }
 
     // Viser "Neste Spørsmål"-knappen
@@ -92,10 +127,28 @@ function nextQuestion() {
     if (currentQuestionIndex < questions.length) {
         showQuestion();
     } else {
-        feedbackElement.textContent = "Gratulerer! Du har fullført quizen.";
-        questionElement.style.display = "none";
-        choicesElement.style.display = "none";
-        nextQuestionButton.style.display = "none";
+        showResults();
+    }
+}
+
+// Funksjon for å vise resultater
+function showResults() {
+    questionElement.style.display = "none";
+    choicesElement.style.display = "none";
+    nextQuestionButton.style.display = "none";
+
+    feedbackElement.textContent = `Du fikk ${score} av ${questions.length} riktige.`;
+    feedbackElement.style.color = "black";
+
+    if (incorrectQuestions.length > 0) {
+        const incorrectList = document.createElement("ul");
+        feedbackElement.textContent += " Du fikk feil på følgende spørsmål:\n";
+        incorrectQuestions.forEach(index => {
+            const listItem = document.createElement("li");
+            listItem.textContent = questions[index].question;
+            incorrectList.appendChild(listItem);
+        });
+        feedbackElement.appendChild(incorrectList);
     }
 }
 
@@ -103,4 +156,5 @@ function nextQuestion() {
 nextQuestionButton.addEventListener("click", nextQuestion);
 
 // Start quizen ved å vise det første spørsmålet
+shuffle(questions); // Blander spørsmålene
 showQuestion();
